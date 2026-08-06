@@ -1,0 +1,102 @@
+# ==========================================
+# PNPM & Monorepo Workspaces
+# ==========================================
+node_modules/
+.pnpm-store/
+.pnpm-debug.log*
+pnpm-debug.log*
+pnpm-lock.yaml.version
+*.pnpm
+
+dist/
+build/
+out/
+.pnpm-workspace-state.json
+
+# TypeScript compilation caches
+*.tsbuildinfo
+
+
+.env
+.env.*
+!.env.example
+!.env.test
+
+# Local environment overrides
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+
+# Prisma generated client output (if directed outside node_modules)
+apps/backend/prisma/migrations/dev.db
+apps/backend/prisma/migrations/dev.db-journal
+
+# Database files / SQLite local testing
+*.sqlite
+*.sqlite-journal
+*.db
+
+# NestJS CLI cache
+.nest/
+
+# Vite build output
+apps/frontend/dist/
+apps/frontend/dist-ssr/
+
+# PWA / Service Worker generated assets
+apps/frontend/dev-dist/
+apps/frontend/sw.js
+apps/frontend/sw.js.map
+apps/frontend/workbox-*.js
+
+# Frontend cache directories
+.vite/
+.cache/
+
+# Logs & Process Managers
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# JetBrains / WebStorm
+.idea/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+
+# Window
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+
+coverage/
+.nyc_output/
+*.lcov
+junit.xml
+
+
+*.tmp
+*.temp
+*.swp
+*.swo
+*.tgz
+*.tar.gz
+*.zip
