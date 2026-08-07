@@ -1,0 +1,281 @@
+{
+	"info": {
+		"_postman_id": "aris-ghs-nest-prisma-collection-v1",
+		"name": "ARIS GHS ANC Platform - NestJS REST API",
+		"description": "Complete Postman collection for Ghana Health Service (GHS) ARIS platform backed by NestJS, Prisma ORM, and PostgreSQL.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login (Midwife / Staff)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"midwife_fati\",\n  \"password\": \"GHS_Tamale_2026\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get User Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/profile",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"profile"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Patients",
+			"item": [
+				{
+					"name": "Get All Patients",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/patients",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"patients"
+							]
+						}
+					}
+				},
+				{
+					"name": "Register New Patient",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"serialNo\": \"ANC-2026-004\",\n  \"regNo\": \"GHS-TCH-0892\",\n  \"nhisNo\": \"48201934\",\n  \"name\": \"Rahinatu Yakubu\",\n  \"age\": 26,\n  \"gestationWeeks\": 24,\n  \"edd\": \"2026-11-18\",\n  \"gravida\": 2,\n  \"para\": 1,\n  \"abortions\": 0,\n  \"livingChildren\": 1,\n  \"bloodGroup\": \"O Positive\",\n  \"riskStatus\": \"High Risk\",\n  \"riskFactors\": [\n    {\n      \"id\": \"rf-101\",\n      \"name\": \"Severe Anemia\",\n      \"detail\": \"Hb level 8.4 g/dL at 24 weeks\",\n      \"severity\": \"high\"\n    }\n  ],\n  \"currentStage\": \"ANC\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/patients",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"patients"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Patient by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/patients/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"patients",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "p-1"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "ANC Visits",
+			"item": [
+				{
+					"name": "Get ANC Visits by Patient ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/anc-visits/patient/:patientId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"anc-visits",
+								"patient",
+								":patientId"
+							],
+							"variable": [
+								{
+									"key": "patientId",
+									"value": "p-1"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Record ANC Visit",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patientId\": \"p-1\",\n  \"visitNumber\": 3,\n  \"date\": \"2026-08-07\",\n  \"gestationalAge\": 28,\n  \"weightKg\": 64.5,\n  \"sysBP\": 132,\n  \"diaBP\": 84,\n  \"fundalHeightCm\": 28,\n  \"fetalHeartRateBpm\": 144,\n  \"presentation\": \"Cephalic\",\n  \"edemaPresent\": false,\n  \"pallorChecked\": true,\n  \"hemoglobin\": 10.8,\n  \"urineProtein\": \"Nil\",\n  \"urineSugar\": \"Nil\",\n  \"hivTest\": \"NR\",\n  \"syphilisTest\": \"NR\",\n  \"hepBTest\": \"NR\",\n  \"iptpMalaria\": \"Dose 2 (SP)\",\n  \"tdVaccine\": \"TD 2\",\n  \"itnIssued\": true,\n  \"dewormingGiven\": true,\n  \"counselingTopics\": [\"Birth Preparedness\", \"Nutrition in Pregnancy\"],\n  \"remarks\": \"Progressing well. Continue IFA tablets.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/anc-visits",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"anc-visits"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Khaya AI Local Language Services",
+			"item": [
+				{
+					"name": "Khaya Translate (English <-> Dagbani / Twi / Ewe)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"text\": \"You must take 2 tablets of Iron Folic Acid every morning after food.\",\n  \"sourceLang\": \"English\",\n  \"targetLang\": \"Dagbani\",\n  \"domain\": \"Maternal Health Counseling\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/khaya/translate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"khaya",
+								"translate"
+							]
+						}
+					}
+				},
+				{
+					"name": "Khaya Voice Dictation Parser",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"spokenText\": \"Anya tim BP yɛ 145/95 mmHg. She reports severe headache and blurry vision.\",\n  \"inputLanguage\": \"Dagbani\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/khaya/dictate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"khaya",
+								"dictate"
+							]
+						}
+					}
+				},
+				{
+					"name": "Khaya Speech Synthesis (TTS)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"text\": \"Mba suɣilo, chami ashibiti din miri a pam pɔi ka doro chaŋ to.\",\n  \"voiceName\": \"Kore\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/khaya/tts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"khaya",
+								"tts"
+							]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "jwt_token",
+			"value": "your_jwt_auth_token_here",
+			"type": "string"
+		}
+	]
+}

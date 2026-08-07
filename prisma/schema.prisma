@@ -1,0 +1,192 @@
+// ARIS Ghana Health Service (GHS) Antenatal Care Platform
+// Prisma Schema for PostgreSQL Database - 100% Matched with Frontend TypeScript Models
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model StaffMember {
+  id         String   @id @default(uuid())
+  name       String
+  initials   String
+  role       String
+  contact    String
+  status     String   @default("Active") // 'Active' | 'Inactive'
+  colorClass String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("staff_members")
+}
+
+model Patient {
+  id                     String   @id @default(uuid())
+  serialNo               String   @unique
+  regNo                  String   @unique
+  nhisNo                 String
+  name                   String
+  age                    Int
+  gestationWeeks         Int
+  edd                    String   // YYYY-MM-DD
+  gravida                Int      @default(1)
+  para                   Int      @default(0)
+  abortions              Int      @default(0)
+  livingChildren         Int      @default(0)
+  bloodGroup             String
+  riskStatus             String   @default("Normal") // 'High Risk' | 'Normal' | 'Overdue'
+  photoUrl               String?
+  partnerName            String?
+  partnerPhone           String?
+  emergencyContact       String?
+  surgicalNotes          String?
+  infantFeedingIntention String?
+  currentStage           String   @default("ANC") // 'ANC' | 'Delivery' | 'PNC' | 'CWC'
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  riskFactors RiskFactor[]
+  ancVisits   ANCVisitRecord[]
+  deliveries  DeliveryRecord[]
+  pncVisits   PNCVisitRecord[]
+  children    ChildRecord[]
+
+  @@map("patients")
+}
+
+model RiskFactor {
+  id        String   @id @default(uuid())
+  patientId String
+  patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  name      String
+  detail    String
+  severity  String   @default("high") // 'high' | 'medium' | 'low'
+  createdAt DateTime @default(now())
+
+  @@map("risk_factors")
+}
+
+model ANCVisitRecord {
+  id                  String   @id @default(uuid())
+  patientId           String
+  patient             Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  visitNumber         Int
+  date                String   // YYYY-MM-DD
+  gestationalAge      Int
+  weightKg            Float
+  sysBP               Int
+  diaBP               Int
+  fundalHeightCm      Float
+  fetalHeartRateBpm   Int
+  presentation        String   @default("Cephalic") // 'Cephalic' | 'Breech' | 'Transverse' | 'N/A (< 28wks)'
+  edemaPresent        Boolean  @default(false)
+  pallorChecked       Boolean  @default(false)
+  hemoglobin          Float
+  urineProtein        String   @default("Nil")
+  urineSugar          String   @default("Nil")
+  hivTest             String   @default("NR") // 'NR' | 'R' | 'N/D'
+  syphilisTest        String   @default("NR") // 'NR' | 'R' | 'N/D'
+  hepBTest            String   @default("NR") // 'NR' | 'R' | 'N/D'
+  iptpMalaria         String   @default("Dose 1 (SP)")
+  tdVaccine           String   @default("TD 1")
+  itnIssued           Boolean  @default(true)
+  dewormingGiven      Boolean  @default(false)
+  counselingTopics    String[] @default([])
+  remarks             String   @default("")
+  nextAppointmentDate String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@map("anc_visit_records")
+}
+
+model DeliveryRecord {
+  id                  String   @id @default(uuid())
+  patientId           String
+  patient             Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  dateOfDelivery      String
+  timeOfDelivery      String
+  gestationalAgeWeeks Int
+  attendantName       String
+  deliveryType        String   @default("Single") // 'Single' | 'Multiple'
+  modeOfDelivery      String   @default("SVD (Vaginal)") // 'SVD (Vaginal)' | 'Caesarean Section (CS)' | 'Assisted (Vacuum/Forceps)'
+  complications       String[] @default([])
+  otherComplications  String?
+  maternalStatus      String   @default("Alive & Discharged") // 'Alive & Discharged' | 'Referred to Higher Level' | 'Deceased'
+  facilityDeliveredAt String   @default("Tamale Central Hospital")
+  createdAt           DateTime @default(now())
+
+  @@map("delivery_records")
+}
+
+model PNCVisitRecord {
+  id                       String   @id @default(uuid())
+  patientId                String
+  patient                  Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  timingCategory           String   @default("24-48 Hours") // '24-48 Hours' | '6-7 Days' | '6 Weeks'
+  sysBP                    Int
+  diaBP                    Int
+  temperatureC             Float
+  fundalHeightStatus       String
+  breastCondition          String
+  lochia                   String
+  woundCondition           String
+  depressionScreening      String   @default("Normal, no concerns") // 'Normal, no concerns' | 'Signs of Baby Blues' | 'Risk of PPD (Referral Needed)'
+  postnatalHb              Float
+  hivRetesting             String   @default("Negative")
+  familyPlanningCounseling String
+  acceptedMethodName       String?
+  createdAt                DateTime @default(now())
+
+  @@map("pnc_visit_records")
+}
+
+model ChildRecord {
+  id               String   @id @default(uuid())
+  motherPatientId  String
+  mother           Patient  @relation(fields: [motherPatientId], references: [id], onDelete: Cascade)
+  name             String
+  gender           String   @default("Female") // 'Male' | 'Female'
+  dob              String   // YYYY-MM-DD
+  cwcSerialNo      String   @unique
+  regNo            String   @unique
+  birthWeightKg    Float
+  birthLengthCm    Float
+  gaAtBirthWeeks   Int
+  sickleCellStatus String   @default("Negative") // 'Negative' | 'Positive' | 'Pending'
+  milestones       Json     // { smiles6w: boolean, headControl3m: boolean, sitsWithoutSupport6m: boolean }
+  immunizations    Json     // { bcgDate?: string, opv0Date?: string, penta1Date?: string, pcv1Date?: string }
+  growthEntries    Json     // Array of growth monitoring entries
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@map("child_records")
+}
+
+model KhayaTranslationLog {
+  id             String   @id @default(uuid())
+  sourceText     String
+  targetLang     String
+  translatedText String
+  phonetic       String?
+  medicalNotes   String?
+  createdAt      DateTime @default(now())
+
+  @@map("khaya_translation_logs")
+}
+
+model FacilityProfile {
+  id          String   @id @default("default")
+  name        String   @default("Tamale Central Hospital")
+  type        String   @default("Regional Secondary Facility")
+  region      String   @default("Northern Region (Tamale)")
+  district    String   @default("Tamale Metro")
+  subDistrict String   @default("Aboabo Sub-District")
+  updatedAt   DateTime @updatedAt
+
+  @@map("facility_profile")
+}

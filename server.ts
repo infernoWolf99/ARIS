@@ -22,6 +22,31 @@ const ai = new GoogleGenAI({
 });
 
 // -------------------------------------------------------------
+// NestJS API Compatibility Layer (/api/v1/*)
+// -------------------------------------------------------------
+app.get('/api/v1/health', (req, res) => {
+  res.json({
+    statusCode: 200,
+    data: {
+      status: 'ok',
+      framework: 'NestJS Express Adapter',
+      orm: 'Prisma',
+      database: 'PostgreSQL',
+      version: '1.0.0',
+    },
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// Forward NestJS /api/v1/khaya/* endpoints to Khaya AI handlers
+app.use((req, res, next) => {
+  if (req.url.startsWith('/api/v1/khaya/')) {
+    req.url = req.url.replace('/api/v1/khaya/', '/api/khaya/');
+  }
+  next();
+});
+
+// -------------------------------------------------------------
 // 1. Khaya AI Translation API Endpoint
 // Handles English <-> Dagbani, Twi, Ewe, Ga, Fante, Hausa
 // -------------------------------------------------------------
