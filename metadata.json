@@ -1,0 +1,6 @@
+{
+  "name": "ARIS - GHS Antenatal Records",
+  "description": "Antenatal Records & Information System for Ghana Health Service clinical care tracking and user management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
