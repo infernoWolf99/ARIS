@@ -1,47 +1,47 @@
 # ARIS Ghana Health Service (GHS) Antenatal Care Platform
 ## Complete Backend Developer Specification & API Mapping Guide
 
-This document provides a complete, production-ready backend specification for building the **ARIS (Antenatal Records & Information System)** backend with NestJS, Prisma ORM, PostgreSQL, and Khaya AI language integration.
+This specification provides the complete, production-ready backend specification for building the **ARIS (Antenatal Records & Information System)** backend using **NestJS**, **Prisma ORM**, **PostgreSQL**, and **Khaya AI** local West African language integration.
 
 ---
 
-## 1. Stack & Infrastructure Overview
+## 1. Stack & System Architecture Summary
 
-| Layer | Recommended Technology | Details |
+| Layer | Selected Technology | Notes |
 | :--- | :--- | :--- |
-| **Language** | TypeScript (Strict Mode) | Shared type definitions with frontend |
-| **Framework** | NestJS (Express Adapter) | RESTful API running on port `3000` with `/api/v1` prefix |
-| **Database** | PostgreSQL 15+ | Relational data store |
-| **ORM** | Prisma ORM | Schema defined in `prisma/schema.prisma` |
-| **Authentication** | NestJS `@nestjs/jwt` + `@nestjs/passport` | JWT Bearer token authentication |
-| **API Testing** | Postman | Import collection at `/postman/aris_ghs_nest_api.postman_collection.json` |
-| **AI Integration** | Gemini 2.5 API + Khaya AI API | Medical AI summaries and West African voice/text translation |
+| **Language** | TypeScript (Strict Mode) | Shared typing conventions between React & NestJS |
+| **Backend Framework** | NestJS (Express adapter) | Listening on port `3000` with global prefix `/api/v1/*` |
+| **Database** | PostgreSQL 15+ | Relational persistence with UUID primary keys |
+| **ORM** | Prisma ORM | Schema defined at `prisma/schema.prisma` |
+| **Authentication** | NestJS `@nestjs/jwt` + `@nestjs/passport` | JWT Bearer Token authorization with clinician role claims |
+| **API Testing** | Postman Collection | Available at `/postman/aris_ghs_nest_api.postman_collection.json` |
+| **Language & Medical AI** | Khaya AI + Gemini 2.5 API | West African voice dictation (Dagbani/Twi/Ewe), TTS audio, and risk stratification |
 
 ---
 
 ## 2. Environment Variables Setup (`.env`)
 
 ```env
-# Server Config
+# Server Runtime
 PORT=3000
 NODE_ENV=development
 API_PREFIX=/api/v1
 
-# PostgreSQL Database Connection
+# Database Connection (PostgreSQL)
 DATABASE_URL="postgresql://postgres:postgres_password@localhost:5432/aris_ghs_db?schema=public"
 
-# Authentication
+# Authentication Secrets
 JWT_SECRET="ghs_tamale_maternal_health_secret_key_2026"
 JWT_EXPIRES_IN="7d"
 
-# AI Services
+# AI Integrations
 GEMINI_API_KEY="your_google_gemini_api_key"
 KHAYA_AI_API_KEY="your_khaya_ai_api_key"
 ```
 
 ---
 
-## 3. NestJS Setup & CORS Configuration (`main.ts`)
+## 3. NestJS Server Entry Point (`main.ts`)
 
 ```typescript
 import { NestFactory } from '@nestjs/core';
@@ -50,8 +50,8 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
-  // Set global API prefix
+
+  // Set global API routing prefix
   app.setGlobalPrefix('api/v1');
 
   // Enable CORS for frontend client
@@ -61,11 +61,17 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // Enable automatic DTO validation
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+  // Global DTO validation pipe
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
 
   await app.listen(3000, '0.0.0.0');
-  console.log(`ARIS GHS NestJS Backend running on http://localhost:3000/api/v1`);
+  console.log('ARIS GHS NestJS Backend running on http://localhost:3000/api/v1');
 }
 bootstrap();
 ```
@@ -74,7 +80,7 @@ bootstrap();
 
 ## 4. Complete Prisma Database Schema (`prisma/schema.prisma`)
 
-Save this file as `prisma/schema.prisma` in your NestJS project root:
+Place this file at `prisma/schema.prisma` in your backend project root:
 
 ```prisma
 // ARIS Ghana Health Service (GHS) Antenatal Care Platform
@@ -93,7 +99,7 @@ model StaffMember {
   id         String   @id @default(uuid())
   name       String
   initials   String
-  role       String
+  role       String   // 'Senior Midwife' | 'Obstetrician' | 'CHO Field Officer' | 'Data Clerk'
   contact    String
   status     String   @default("Active") // 'Active' | 'Inactive'
   colorClass String?
@@ -111,7 +117,7 @@ model Patient {
   name                   String
   age                    Int
   gestationWeeks         Int
-  edd                    String   // YYYY-MM-DD format
+  edd                    String   // YYYY-MM-DD
   gravida                Int      @default(1)
   para                   Int      @default(0)
   abortions              Int      @default(0)
@@ -275,40 +281,77 @@ model FacilityProfile {
 
 ## 5. NestJS API Routes & Controllers Reference
 
-### 5.1. Response Format Wrapper
-All NestJS endpoints should respond with this envelope:
+### 5.1. Standard Response Envelope
+All API controllers return responses wrapped in this standard payload envelope:
 ```json
 {
   "statusCode": 200,
   "data": { ... },
-  "message": "Success",
-  "timestamp": "2026-08-07T12:00:00.000Z"
+  "message": "Operation successful",
+  "timestamp": "2026-08-07T13:20:00.000Z"
 }
 ```
 
 ---
 
-### 5.2. Auth Controller (`/api/v1/auth`)
+### 5.2. Auth & Session Controller (`/api/v1/auth`)
 
-| HTTP Method | Route Endpoint | Purpose | Request Payload |
+Handles GHS clinician authentication and session validation:
+
+| Method | Endpoint | Description | Request Body |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/api/v1/auth/login` | Clinician login | `{ "username": "fati", "password": "xxx" }` |
-| `GET` | `/api/v1/auth/profile` | Current clinician info | *Header: Authorization: Bearer <token>* |
+| `POST` | `/api/v1/auth/login` | Clinician Sign In | `{ "username": "ama.jumah", "pin": "1234", "facilityName": "Accra Polyclinic Maternity Ward", "role": "Senior Midwife" }` |
+| `GET` | `/api/v1/auth/me` | Fetch active user session | *Header: Authorization: Bearer <token>* |
+| `POST` | `/api/v1/auth/logout` | Invalidate active JWT token | *Header: Authorization: Bearer <token>* |
+
+#### Sample Login Request Payload (`POST /api/v1/auth/login`):
+```json
+{
+  "username": "ama.jumah",
+  "pin": "1234",
+  "facilityName": "Accra Polyclinic Maternity Ward",
+  "role": "Senior Midwife"
+}
+```
+
+#### Sample Login Response:
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "userSession": {
+      "username": "ama.jumah",
+      "staffMember": {
+        "id": "staff-001",
+        "name": "Ama Jumah",
+        "initials": "AJ",
+        "role": "Senior Midwife",
+        "contact": "+233 55 123 4567",
+        "status": "Active"
+      },
+      "facilityName": "Accra Polyclinic Maternity Ward",
+      "loginTime": "2026-08-07T13:20:00.000Z"
+    }
+  },
+  "message": "Authenticated successfully as Senior Midwife"
+}
+```
 
 ---
 
-### 5.3. Patients Controller (`/api/v1/patients`)
+### 5.3. Patient Registry Controller (`/api/v1/patients`)
 
-| HTTP Method | Route Endpoint | Purpose |
+| Method | Endpoint | Description |
 | :--- | :--- | :--- |
 | `GET` | `/api/v1/patients` | Retrieve all registered maternal patients |
-| `GET` | `/api/v1/patients/:id` | Fetch patient with relations (`riskFactors`, `ancVisits`, `deliveries`, `pncVisits`, `children`) |
-| `POST` | `/api/v1/patients` | Register a new maternal health patient |
+| `GET` | `/api/v1/patients/:id` | Fetch patient with all relations (`riskFactors`, `ancVisits`, `deliveries`, `pncVisits`, `children`) |
+| `POST` | `/api/v1/patients` | Register new maternal health patient |
 | `PUT` | `/api/v1/patients/:id` | Update patient record |
 | `DELETE` | `/api/v1/patients/:id` | Delete patient record |
-| `GET` | `/api/v1/patients/search?q=...` | Search patients by serial, regNo, or name |
+| `GET` | `/api/v1/patients/search?q=...` | Search by serialNo, regNo, or patient name |
 
-#### Sample Request (`POST /api/v1/patients`):
+#### Sample Create Patient Request (`POST /api/v1/patients`):
 ```json
 {
   "serialNo": "ANC-2026-004",
@@ -345,12 +388,12 @@ All NestJS endpoints should respond with this envelope:
 
 ### 5.4. ANC Visits Controller (`/api/v1/anc-visits`)
 
-| HTTP Method | Route Endpoint | Purpose |
+| Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/api/v1/anc-visits/patient/:patientId` | Get routine ANC visits for a patient |
-| `POST` | `/api/v1/anc-visits` | Save routine ANC visit record |
+| `GET` | `/api/v1/anc-visits/patient/:patientId` | List routine ANC visits for a patient |
+| `POST` | `/api/v1/anc-visits` | Create new routine ANC visit record |
 
-#### Sample Request (`POST /api/v1/anc-visits`):
+#### Sample ANC Visit Request (`POST /api/v1/anc-visits`):
 ```json
 {
   "patientId": "p-1",
@@ -385,16 +428,16 @@ All NestJS endpoints should respond with this envelope:
 
 ### 5.5. Khaya AI Language Controller (`/api/v1/khaya`)
 
-Handles West African local languages (Dagbani, Twi, Ewe, Fante, Ga, Hausa):
+Connects to West African local language services (Dagbani, Twi, Ewe, Fante, Ga):
 
-| HTTP Method | Route Endpoint | Purpose |
+| Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `POST` | `/api/v1/khaya/translate` | Translate text between English and Dagbani/Twi |
+| `POST` | `/api/v1/khaya/translate` | Translate text between English and local languages |
 | `POST` | `/api/v1/khaya/dictate` | Voice dictation parser extracting vitals & danger signs |
 | `POST` | `/api/v1/khaya/patient-alert` | Generate localized SMS broadcast draft & audio voice cue |
 | `POST` | `/api/v1/khaya/tts` | Synthesize local language text into audio base64 |
 
-#### Sample Dictation Request (`POST /api/v1/khaya/dictate`):
+#### Sample Voice Dictation Payload (`POST /api/v1/khaya/dictate`):
 ```json
 {
   "spokenText": "Anya tim BP yɛ 145/95 mmHg. She reports severe headache and blurry vision.",
@@ -402,7 +445,7 @@ Handles West African local languages (Dagbani, Twi, Ewe, Fante, Ga, Hausa):
 }
 ```
 
-#### Sample Dictation Response:
+#### Sample Response:
 ```json
 {
   "statusCode": 200,
@@ -429,18 +472,21 @@ Handles West African local languages (Dagbani, Twi, Ewe, Fante, Ga, Hausa):
 
 ---
 
-### 5.6. Deliveries Controller (`/api/v1/deliveries`)
-- `GET /api/v1/deliveries/patient/:patientId`
-- `POST /api/v1/deliveries`
+### 5.6. Facilities Controller (`/api/v1/facilities`)
 
-### 5.7. PNC Visits Controller (`/api/v1/pnc-visits`)
-- `GET /api/v1/pnc-visits/patient/:patientId`
-- `POST /api/v1/pnc-visits`
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/v1/facilities` | List available GHS stations (Tamale Central, Accra Poly, etc.) |
+| `GET` | `/api/v1/facilities/profile` | Get current active station profile |
+| `PUT` | `/api/v1/facilities/profile` | Update station profile details |
 
-### 5.8. Child Welfare Controller (`/api/v1/children`)
-- `GET /api/v1/children`
-- `GET /api/v1/children/mother/:motherPatientId`
-- `POST /api/v1/children`
+---
+
+### 5.7. Additional Service Endpoints
+- **Delivery Outcomes (`/api/v1/deliveries`)**: `GET /patient/:patientId`, `POST /`
+- **Postnatal Care (`/api/v1/pnc-visits`)**: `GET /patient/:patientId`, `POST /`
+- **Child Welfare Records (`/api/v1/children`)**: `GET /`, `GET /mother/:motherPatientId`, `POST /`
+- **Staff Management (`/api/v1/staff`)**: `GET /`, `POST /`
 
 ---
 
@@ -456,7 +502,7 @@ To import into Postman:
 
 ---
 
-## 7. Connecting Frontend to NestJS
+## 7. Connecting Frontend to NestJS Server
 
 In your frontend `.env` configuration:
 ```env
@@ -464,4 +510,4 @@ VITE_API_BASE_URL=http://localhost:3000/api/v1
 VITE_USE_NEST_API=true
 ```
 
-All frontend requests will automatically proxy to your NestJS server endpoints.
+All React components will route requests directly to your NestJS server endpoints.

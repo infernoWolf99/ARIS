@@ -8,7 +8,7 @@ interface SideNavBarProps {
 }
 
 export const SideNavBar: React.FC<SideNavBarProps> = ({ mobileOpen, onCloseMobile }) => {
-  const { activeView, setActiveView, setQuickActionOpen } = useApp();
+  const { activeView, setActiveView, setQuickActionOpen, currentUser, logout } = useApp();
 
   const navItems: { id: ViewMode; label: string; icon: string }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
@@ -91,27 +91,44 @@ export const SideNavBar: React.FC<SideNavBarProps> = ({ mobileOpen, onCloseMobil
         })}
       </ul>
 
-      {/* Footer Items */}
-      <div className="mt-auto border-t border-[#bdc9c8] pt-4 space-y-1">
+      {/* Footer Items & User Profile */}
+      <div className="mt-auto border-t border-[#bdc9c8] pt-4 space-y-3">
+        {currentUser && (
+          <div className="flex items-center gap-3 px-2 py-2 bg-[#dee8ff]/60 rounded-xl border border-[#bdc9c8]/50">
+            <div className="w-9 h-9 rounded-full bg-[#007a78] text-[#abfffc] font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+              {currentUser.staffMember.initials || 'AJ'}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold text-[#111c2d] truncate">
+                {currentUser.staffMember.name}
+              </p>
+              <p className="text-[10px] text-[#005f5e] font-semibold truncate">
+                {currentUser.staffMember.role}
+              </p>
+            </div>
+          </div>
+        )}
+
         <button
           onClick={() => {
             alert('Support Helpdesk: Ghana Health Service IT Support (Toll-free 333 or support@ghs.gov.gh)');
             if (onCloseMobile) onCloseMobile();
           }}
-          className="w-full flex items-center gap-3 text-[#3e4948] px-4 py-2.5 hover:bg-[#dee8ff] rounded-lg transition-all font-label-md text-sm cursor-pointer"
+          className="w-full flex items-center gap-3 text-[#3e4948] px-3.5 py-2.5 hover:bg-[#dee8ff] rounded-lg transition-all font-label-md text-xs sm:text-sm cursor-pointer"
         >
-          <span className="material-symbols-outlined text-xl">help</span>
-          <span>Support</span>
+          <span className="material-symbols-outlined text-lg">help</span>
+          <span>Support Desk</span>
         </button>
+
         <button
           onClick={() => {
-            alert('You have logged out safely from ARIS.');
+            logout();
             if (onCloseMobile) onCloseMobile();
           }}
-          className="w-full flex items-center gap-3 text-[#3e4948] px-4 py-2.5 hover:bg-[#dee8ff] rounded-lg transition-all font-label-md text-sm cursor-pointer"
+          className="w-full flex items-center gap-3 text-[#ba1a1a] bg-[#ba1a1a]/5 hover:bg-[#ba1a1a]/15 border border-[#ba1a1a]/20 px-3.5 py-2.5 rounded-xl transition-all font-label-md text-xs sm:text-sm font-bold cursor-pointer"
         >
-          <span className="material-symbols-outlined text-xl">logout</span>
-          <span>Logout</span>
+          <span className="material-symbols-outlined text-lg">logout</span>
+          <span>Sign Out / Logout</span>
         </button>
       </div>
     </div>

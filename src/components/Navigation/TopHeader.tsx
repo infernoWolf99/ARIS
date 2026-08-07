@@ -18,7 +18,10 @@ export const TopHeader: React.FC<TopHeaderProps> = ({ onOpenMobileNav }) => {
     patients,
     setActivePatient,
     setActiveView,
+    currentUser,
+    logout,
   } = useApp();
+
 
   const [facilityDropdownOpen, setFacilityDropdownOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
@@ -171,13 +174,35 @@ export const TopHeader: React.FC<TopHeaderProps> = ({ onOpenMobileNav }) => {
           )}
         </div>
 
-        {/* Provider Profile Avatar */}
-        <img
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpGyzcu0XeyQOQOj1XAky2gwSrKw8Www6ps2nlwUqPsf8DeqF3VkfJZ0sSZdUv_IBSOuCFoGNxeOeffsJD9SgfCKMTPNbEueHClaOUC9NKMKjxk0f66wBvAP39O63G_YnbdN9wO1Cloz7NU8rZBP0h7Xha-rChjCYKW7T0m6_IKCKp87VNNDNQBPOYWrYPY4aX1O8mX6ar79KAkzMrT9A-gzX6IJLnbO8vFq0aisIx1m65yeAg8yPbkA"
-          alt="Healthcare Provider Profile"
-          className="w-8 h-8 rounded-full object-cover border border-[#bdc9c8]"
-        />
+        {/* Provider Profile Badge & Logout Button */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5 border-l border-[#bdc9c8]/40 pl-2">
+          <div className="hidden lg:flex flex-col text-right leading-tight">
+            <span className="text-xs font-bold text-[#111c2d]">
+              {currentUser?.staffMember.name || 'Ama Jumah'}
+            </span>
+            <span className="text-[10px] text-[#005f5e] font-semibold">
+              {currentUser?.staffMember.role || 'Senior Midwife'}
+            </span>
+          </div>
+
+          <div
+            className="w-8 h-8 rounded-full bg-[#007a78] text-[#abfffc] font-bold text-xs flex items-center justify-center shadow-xs border border-[#005f5e]/30 shrink-0"
+            title={`${currentUser?.staffMember.name} (${currentUser?.staffMember.role})`}
+          >
+            {currentUser?.staffMember.initials || 'AJ'}
+          </div>
+
+          <button
+            onClick={logout}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-[#ba1a1a] bg-[#ba1a1a]/5 hover:bg-[#ba1a1a]/15 border border-[#ba1a1a]/20 rounded-lg transition-all cursor-pointer font-bold text-xs active:scale-95 min-h-[36px]"
+            title="Sign Out of ARIS Platform"
+          >
+            <span className="material-symbols-outlined text-base">logout</span>
+            <span className="hidden sm:inline">Logout</span>
+          </button>
+        </div>
       </div>
     </header>
   );
+
 };

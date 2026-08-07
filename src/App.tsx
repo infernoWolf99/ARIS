@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
+import { LoginPage } from './components/Auth/LoginPage';
 import { SideNavBar } from './components/Navigation/SideNavBar';
 import { TopHeader } from './components/Navigation/TopHeader';
 import { QuickActionModal } from './components/Modals/QuickActionModal';
@@ -16,10 +17,15 @@ import { ChildProfileView } from './components/Views/ChildProfileView';
 import { CoCTrackerView } from './components/Views/CoCTrackerView';
 
 const MainAppContent: React.FC = () => {
-  const { activeView, toastMessage } = useApp();
+  const { activeView, toastMessage, isAuthenticated } = useApp();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
+  if (!isAuthenticated) {
+    return <LoginPage />;
+  }
+
   const renderCurrentView = () => {
+
     switch (activeView) {
       case 'dashboard':
         return <DashboardView />;

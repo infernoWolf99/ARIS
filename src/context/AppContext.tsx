@@ -9,6 +9,7 @@ import {
   DeliveryRecordData,
   PNCVisitRecord,
   ChildRecord,
+  UserSession,
 } from '../types';
 import {
   initialFacility,
@@ -23,6 +24,10 @@ import {
 } from '../data/mockData';
 
 interface AppContextType {
+  isAuthenticated: boolean;
+  currentUser: UserSession | null;
+  login: (username: string, pin: string, facilityName?: string, role?: string) => boolean;
+  logout: () => void;
   activeView: ViewMode;
   setActiveView: (view: ViewMode) => void;
   facility: FacilityProfile;
@@ -62,11 +67,19 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState<UserSession | null>(() => {
+    const saved = localStorage.getItem('aris_auth_session');
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  const isAuthenticated = !!currentUser;
+
   const [activeView, setActiveView] = useState<ViewMode>('dashboard');
   const [facility, setFacility] = useState<FacilityProfile>(() => {
     const saved = localStorage.getItem('aris_facility');
     return saved ? JSON.parse(saved) : initialFacility;
   });
+
 
   const [staffList, setStaffList] = useState<StaffMember[]>(() => {
     const saved = localStorage.getItem('aris_staff');
@@ -153,9 +166,50 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }, 3500);
   };
 
+  const login = (username: string, pin: string, facilityName?: string, role?: string): boolean => {
+    let staff = staffList.find(
+      (s) => s.name.toLowerCase().includes(username.toLowerCase()) || s.id.toLowerCase() === username.toLowerCase()
+    );
+
+    if (!staff) {
+      staff = {
+        id: `staff-${Date.now()}`,
+        name: username || 'Ama Jumah',
+        initials: (username || 'AJ').substring(0, 2).toUpperCase(),
+        role: role || 'Senior Midwife',
+        contact: '+233 55 123 4567',
+        status: 'Active',
+        colorClass: 'bg-[#007a78] text-[#abfffc]',
+      };
+    }
+
+    const targetFacility = facilityName || facility.name;
+    const session: UserSession = {
+      username: username || 'ama.jumah',
+      staffMember: staff,
+      loginTime: new Date().toISOString(),
+      facilityName: targetFacility,
+    };
+
+    setCurrentUser(session);
+    localStorage.setItem('aris_auth_session', JSON.stringify(session));
+    if (facilityName && facilityName !== facility.name) {
+      setFacility((prev) => ({ ...prev, name: facilityName }));
+    }
+    showToast(`Welcome back, ${staff.name} (${staff.role})!`);
+    return true;
+  };
+
+  const logout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem('aris_auth_session');
+    showToast('Signed out of ARIS GHS Platform.');
+  };
+
   const setActivePatient = (p: Patient) => {
     setActivePatientState(p);
   };
+
 
   const switchFacilityByName = (name: string) => {
     setFacility((prev) => ({ ...prev, name }));
@@ -247,10 +301,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   return (
     <AppContext.Provider
       value={{
+        isAuthenticated,
+        currentUser,
+        login,
+        logout,
         activeView,
         setActiveView,
         facility,
         setFacility,
+
         availableFacilitiesList: availableFacilities,
         switchFacilityByName,
         staffList,

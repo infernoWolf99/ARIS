@@ -162,3 +162,11 @@ export interface AppNotification {
   type: 'info' | 'warning' | 'alert';
   read: boolean;
 }
+
+export interface UserSession {
+  username: string;
+  staffMember: StaffMember;
+  loginTime: string;
+  facilityName: string;
+}
+
