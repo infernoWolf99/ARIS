@@ -1,21 +1,24 @@
-import { Button } from "@/components/ui/button"
-import { Outlet } from "react-router-dom"
+import { Bell, Settings } from "lucide-react"
+import { Avatar } from "./components/ui/avatar"
 
 export function Layout() {
   return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-        <div>
-          <h1 className="font-medium">Project ready!</h1>
-          <p>You may now add components and start building.</p>
-          <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-2">New Button</Button>
+    <div>
+      <header className="flex h-12 w-full flex-row items-center justify-between bg-secondary text-primary">
+        {/* left side of header  */}
+        <div className="flex flex-row">
+          <span>ARIS</span>
+          <div className="h-[95%] w-2 bg-primary"></div>
         </div>
-        <div className="font-mono text-xs text-muted-foreground">
-          (Press <kbd>d</kbd> to toggle dark mode)
-          <Outlet />
+        {/* right side of header  */}
+        <div className="flex flex-row place-items-center">
+          <Bell />
+          <Settings />
+          <Avatar />
         </div>
-      </div>
+      </header>
+
+      <main></main>
     </div>
   )
 }
