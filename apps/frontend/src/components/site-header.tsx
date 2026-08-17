@@ -1,16 +1,17 @@
 import { Separator } from "@/components/ui/separator"
 import { AvatarFallback, AvatarImage, Avatar } from "./ui/avatar"
-import AvatarImg from '../assets/avatar0.png'
+import AvatarImg from "../assets/avatar0.png"
 import CustomTooltip from "./custom/custom-tooltip"
 import { Bell, Settings } from "lucide-react"
+import { SidebarTrigger } from "./ui/sidebar"
 
 export function SiteHeader() {
   return (
-    <header className="global-pad flex h-16 w-full flex-row items-center justify-between bg-secondary text-primary">
+    <header className="global-pad group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height flex h-(--header-height) w-full shrink-0 flex-row items-center justify-between gap-2 rounded-tl-3xl border-b bg-secondary text-primary transition-[width,height] ease-linear">
       {/* left side of header  */}
-      <div className="flex flex-row space-x-5">
+      <div className="flex flex-row place-items-center space-x-5">
+        <SidebarTrigger className="-ml-1" />
         <span className="text-2xl font-black shadow-2xl">ARIS</span>
-        {/* <div className="h-7 w-1 bg-primary"></div> */}
         <Separator orientation="vertical" />
       </div>
       {/* right side of header  */}
