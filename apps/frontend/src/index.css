@@ -155,3 +155,7 @@
 .global-pad {
   @apply px-8
 }
+
+.icon-hover {
+  @apply hover:scale-110 transition-all duration-300 hover:shadow-2xl hover:cursor-pointer;
+}
