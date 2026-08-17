@@ -7,7 +7,7 @@ import { SidebarTrigger } from "./ui/sidebar"
 
 export function SiteHeader() {
   return (
-    <header className="global-pad group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height flex h-(--header-height) w-full shrink-0 flex-row items-center justify-between gap-2 rounded-tl-3xl border-b bg-secondary text-primary transition-[width,height] ease-linear">
+    <header className="global-pad group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height flex h-(--header-height) w-full shrink-0 flex-row items-center justify-between gap-2 border-b bg-secondary text-primary transition-[width,height] ease-linear">
       {/* left side of header  */}
       <div className="flex flex-row place-items-center space-x-5">
         <SidebarTrigger className="-ml-1" />

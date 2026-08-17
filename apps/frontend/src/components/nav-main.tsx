@@ -17,7 +17,10 @@ export function NavMain({ items }: { items: RouteItemType[] }) {
 
             return (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton tooltip={item.title}>
+                <SidebarMenuButton
+                  tooltip={item.title}
+                  render={<a href={item.path} />}
+                >
                   <Icon />
                   <span>{item.title}</span>
                 </SidebarMenuButton>

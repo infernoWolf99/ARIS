@@ -9,8 +9,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { CommandIcon } from "lucide-react"
 import Routes from "@/lib/routes"
+import { Avatar } from "./ui/avatar"
+import { AvatarFallback } from "./ui/avatar"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -19,11 +20,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              className="data-[slot=sidebar-menu-button]:p-1.5!"
+              className="data-[slot=sidebar-menu-button]:p-1.5! h-20"
               render={<a href="#" />}
             >
-              <CommandIcon className="size-5!" />
-              <span className="text-base font-semibold">ARIS</span>
+              <Avatar size="lg">
+                <AvatarFallback>GHS</AvatarFallback>
+              </Avatar>
+              <p className="text-base font-semibold text-wrap wrap-anywhere ">
+                Antenatal Records and Information System
+              </p>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
