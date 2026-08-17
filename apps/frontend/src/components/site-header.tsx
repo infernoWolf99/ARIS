@@ -1,16 +1,38 @@
 import { Separator } from "@/components/ui/separator"
-import { SidebarTrigger } from "@/components/ui/sidebar"
+import { AvatarFallback, AvatarImage, Avatar } from "./ui/avatar"
+import AvatarImg from '../assets/avatar0.png'
+import CustomTooltip from "./custom/custom-tooltip"
+import { Bell, Settings } from "lucide-react"
 
 export function SiteHeader() {
   return (
-    <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
-      <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
-        <SidebarTrigger className="-ml-1" />
-        <Separator
-          orientation="vertical"
-          className="mx-2 h-4 data-vertical:self-auto"
+    <header className="global-pad flex h-16 w-full flex-row items-center justify-between bg-secondary text-primary">
+      {/* left side of header  */}
+      <div className="flex flex-row space-x-5">
+        <span className="text-2xl font-black shadow-2xl">ARIS</span>
+        {/* <div className="h-7 w-1 bg-primary"></div> */}
+        <Separator orientation="vertical" />
+      </div>
+      {/* right side of header  */}
+      <div className="flex flex-row place-items-center space-x-4">
+        <CustomTooltip
+          content="Notification"
+          trigger={<Bell className="icon-hover" />}
         />
-        <h1 className="text-base font-medium">Documents</h1>
+        <CustomTooltip
+          content="Settings"
+          trigger={<Settings className="icon-hover" />}
+        />
+
+        <CustomTooltip
+          content="Profile"
+          trigger={
+            <Avatar className="cursor-pointer hover:scale-110">
+              <AvatarImage src={AvatarImg} />
+              <AvatarFallback>N</AvatarFallback>
+            </Avatar>
+          }
+        />
       </div>
     </header>
   )
