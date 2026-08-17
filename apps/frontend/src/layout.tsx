@@ -38,7 +38,9 @@ export function Layout() {
           />
         </div>
       </header>
-      <main></main>
+      <main>
+        
+      </main>
     </div>
   )
 }
