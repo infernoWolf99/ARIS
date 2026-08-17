@@ -7,11 +7,7 @@ import {
 } from "@/components/ui/sidebar"
 import type { RouteItemType } from "@/types/route.types"
 
-export function NavMain({
-  items,
-}: {
-  items: RouteItemType[]
-}) {
+export function NavMain({ items }: { items: RouteItemType[] }) {
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
