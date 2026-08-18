@@ -6,6 +6,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import type { RouteItemType } from "@/types/route.types"
+import { Link } from "react-router"
 
 export function NavMain({ items }: { items: RouteItemType[] }) {
   return (
@@ -19,7 +20,7 @@ export function NavMain({ items }: { items: RouteItemType[] }) {
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
                   tooltip={item.title}
-                  render={<a href={item.path} />}
+                  render={<Link to={item.path} />}
                 >
                   <Icon />
                   <span>{item.title}</span>

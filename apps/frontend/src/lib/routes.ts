@@ -19,7 +19,7 @@ import {
   Venus
 } from "lucide-react"
 
-const Routes: RouteItemType[] = [
+const ClientRoutes: RouteItemType[] = [
   {
     title: "Dashboard",
     path: "dashboard",
@@ -85,4 +85,4 @@ const Routes: RouteItemType[] = [
   },
 ]
 
-export default Routes
+export default ClientRoutes
