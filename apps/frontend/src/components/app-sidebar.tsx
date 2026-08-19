@@ -10,8 +10,9 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import ClientRoutes from "@/lib/routes"
-import { Avatar } from "./ui/avatar"
+import { Avatar, AvatarImage } from "./ui/avatar"
 import { AvatarFallback } from "./ui/avatar"
+import Logo from "../assets/logo.jpeg"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -24,6 +25,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               render={<a href="#" />}
             >
               <Avatar size="lg">
+                <AvatarImage src={Logo} />
                 <AvatarFallback>GHS</AvatarFallback>
               </Avatar>
               <p className="text-base font-semibold text-wrap wrap-anywhere">

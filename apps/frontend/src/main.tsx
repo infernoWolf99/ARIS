@@ -5,14 +5,14 @@ import "./index.css"
 import Layout from "./layout.tsx"
 import { ThemeProvider } from "@/components/theme-provider.tsx"
 import { TooltipProvider } from "./components/ui/tooltip.tsx"
-import { BrowserRouter, Route, Routes } from "react-router"
+import { BrowserRouter, Route, Routes } from "react-router-dom"
 import type { RouteItemType } from "./types/route.types.ts"
 import ClientRoutes from "./lib/routes.ts"
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider>
-      {/* <TooltipProvider> */}
+      <TooltipProvider>
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Layout />}>
@@ -33,7 +33,7 @@ createRoot(document.getElementById("root")!).render(
             </Route>
           </Routes>
         </BrowserRouter>
-      {/* </TooltipProvider> */}
+      </TooltipProvider>
     </ThemeProvider>
   </StrictMode>
 )

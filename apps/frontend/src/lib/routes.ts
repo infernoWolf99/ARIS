@@ -22,7 +22,7 @@ import {
 const ClientRoutes: RouteItemType[] = [
   {
     title: "Dashboard",
-    path: "dashboard",
+    path: "/",
     icon: LayoutDashboard,
     element: Dashboard,
     index: true,
